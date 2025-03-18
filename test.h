@@ -26,12 +26,16 @@ LICENSE
 /* Check if using C99 or later (inline is supported) */
 #if __STDC_VERSION__ >= 199901L
 #define TEST_INLINE inline
+#define TEST_API extern
 #elif defined(__GNUC__) || defined(__clang__)
 #define TEST_INLINE __inline__
+#define TEST_API static
 #elif defined(_MSC_VER)
 #define TEST_INLINE __inline
+#define TEST_API static
 #else
 #define TEST_INLINE
+#define TEST_API static
 #endif
 
 #ifndef TEST_MAX_NUMBER_OF_TEST_RESULTS
@@ -69,7 +73,7 @@ int SetConsoleTextAttribute(void *hConsoleOutput, unsigned short wAttributes);
 #define COLOR_GREEN 10
 #define COLOR_RED 12
 
-static TEST_INLINE void set_console_color(unsigned short color)
+TEST_API TEST_INLINE void set_console_color(unsigned short color)
 {
     void *hConsole = GetStdHandle((unsigned long)-11);
     SetConsoleTextAttribute(hConsole, color);
@@ -90,7 +94,7 @@ static TEST_INLINE void set_console_color(int color) { (void)color; }
 #define TEST_FUNCTION_PRINTF(f, a1) (printf(f, a1))
 #endif
 
-static TEST_INLINE void test_result_print(test_result result)
+TEST_API TEST_INLINE void test_result_print(test_result result)
 {
     char *txt_header = "TEST";
     char *txt_pass = "PASS";
@@ -112,7 +116,7 @@ static TEST_INLINE void test_result_print(test_result result)
     TEST_FUNCTION_PRINTF(" %s\n", result.expression);
 }
 
-static TEST_INLINE void test_results_size_reached_print(void)
+TEST_API TEST_INLINE void test_results_size_reached_print(void)
 {
     char *txt_header = "TEST";
     char *txt_fail = "WARN";
