@@ -52,17 +52,6 @@ typedef struct test_result
 
 } test_result;
 
-typedef struct test_state
-{
-    unsigned int passed;
-    unsigned int failed;
-    unsigned int length;
-    test_result results[TEST_MAX_NUMBER_OF_TEST_RESULTS];
-
-} test_state;
-
-static test_state test_state_global = {0};
-
 #ifdef _WIN32
 
 #ifndef _WINDOWS_
@@ -118,54 +107,30 @@ TEST_API TEST_INLINE void test_result_print(test_result result)
     TEST_FUNCTION_PRINTF(" %s\n", result.expression);
 }
 
-TEST_API TEST_INLINE void test_results_size_reached_print(void)
+TEST_API TEST_INLINE float test_absf(float x)
 {
-    char *txt_header = "TEST";
-    char *txt_fail = "WARN";
-
-    TEST_FUNCTION_PRINTF("%s", "[");
-    set_console_color(COLOR_BLUE);
-    TEST_FUNCTION_PRINTF("%s", txt_header);
-    set_console_color(COLOR_DEFAULT);
-    TEST_FUNCTION_PRINTF("%s", "] ");
-
-    TEST_FUNCTION_PRINTF("%s", "[");
-    set_console_color(COLOR_RED);
-    TEST_FUNCTION_PRINTF("%s", txt_fail);
-    set_console_color(COLOR_DEFAULT);
-    TEST_FUNCTION_PRINTF("%s", "] ");
-
-    TEST_FUNCTION_PRINTF("%s", "The maximum amount of stored results in [state.results] has reached its limit of: ");
-    TEST_FUNCTION_PRINTF("%i", TEST_MAX_NUMBER_OF_TEST_RESULTS);
-    TEST_FUNCTION_PRINTF("%s\n", " ! Please #define TEST_MAX_NUMBER_OF_TEST_RESULTS if you whish to increase this size!");
+    return (x < 0.0f ? -x : x);
 }
 
-#define test_check(exp, con)                                                     \
-    do                                                                           \
-    {                                                                            \
-        test_result result = {0};                                                \
-        result.file = __FILE__;                                                  \
-        result.line = __LINE__;                                                  \
-        result.expression = #exp;                                                \
-        result.conditional = (con);                                              \
-        result.result = (exp);                                                   \
-        result.result ? test_state_global.passed++ : test_state_global.failed++; \
-        test_result_print(result);                                               \
-        if (test_state_global.length >= TEST_MAX_NUMBER_OF_TEST_RESULTS)         \
-        {                                                                        \
-            test_results_size_reached_print();                                   \
-            test_state_global.length = 0; /* Reset test result storage */        \
-        }                                                                        \
-        test_state_global.results[test_state_global.length] = result;            \
-        test_state_global.length++;                                              \
-        if (!(con) && !result.result)                                            \
-        {                                                                        \
-            *(volatile int *)0 = 0;                                              \
-        }                                                                        \
+#define test_check(exp, con)          \
+    do                                \
+    {                                 \
+        test_result result = {0};     \
+        result.file = __FILE__;       \
+        result.line = __LINE__;       \
+        result.expression = #exp;     \
+        result.conditional = (con);   \
+        result.result = (exp);        \
+        test_result_print(result);    \
+        if (!(con) && !result.result) \
+        {                             \
+            *(volatile int *)0 = 0;   \
+        }                             \
     } while (0)
 
 #define test(exp) test_check(exp, 1)
 #define assert(exp) test_check(exp, 0)
+#define assert_equalsf(a, b, e) test_check(test_absf((a) - (b)) < (e), 0)
 
 #endif /* TEST_H */
 
