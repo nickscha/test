@@ -66,8 +66,7 @@ int SetConsoleTextAttribute(void *hConsoleOutput, unsigned short wAttributes);
 
 TEST_API TEST_INLINE void set_console_color(unsigned short color)
 {
-    void *hConsole = GetStdHandle((unsigned long)-11);
-    SetConsoleTextAttribute(hConsole, color);
+    SetConsoleTextAttribute(GetStdHandle((unsigned long)-11), color);
 }
 
 #else
@@ -85,7 +84,7 @@ static TEST_INLINE void set_console_color(int color) { (void)color; }
 #define TEST_FUNCTION_PRINTF(f, a1) (printf(f, a1))
 #endif
 
-TEST_API TEST_INLINE void test_result_print(test_result result)
+TEST_API TEST_INLINE void test_result_print(test_result *result)
 {
     char *txt_header = "TEST";
     char *txt_pass = "PASS";
@@ -98,13 +97,13 @@ TEST_API TEST_INLINE void test_result_print(test_result result)
     TEST_FUNCTION_PRINTF("%s", "] ");
 
     TEST_FUNCTION_PRINTF("%s", "[");
-    set_console_color(result.result ? COLOR_GREEN : COLOR_RED);
-    TEST_FUNCTION_PRINTF("%s", result.result ? txt_pass : txt_fail);
+    set_console_color(result->result ? COLOR_GREEN : COLOR_RED);
+    TEST_FUNCTION_PRINTF("%s", result->result ? txt_pass : txt_fail);
     set_console_color(COLOR_DEFAULT);
     TEST_FUNCTION_PRINTF("%s", "] ");
-    TEST_FUNCTION_PRINTF("%s:", result.file);
-    TEST_FUNCTION_PRINTF("%-6d", result.line);
-    TEST_FUNCTION_PRINTF(" %s\n", result.expression);
+    TEST_FUNCTION_PRINTF("%s:", result->file);
+    TEST_FUNCTION_PRINTF("%-6d", result->line);
+    TEST_FUNCTION_PRINTF(" %s\n", result->expression);
 }
 
 TEST_API TEST_INLINE float test_absf(float x)
@@ -121,7 +120,7 @@ TEST_API TEST_INLINE float test_absf(float x)
         result.expression = #exp;     \
         result.conditional = (con);   \
         result.result = (exp);        \
-        test_result_print(result);    \
+        test_result_print(&result);   \
         if (!(con) && !result.result) \
         {                             \
             *(volatile int *)0 = 0;   \
