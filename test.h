@@ -128,6 +128,7 @@ TEST_API TEST_INLINE float test_absf(float x)
     } while (0)
 
 #define test(exp) test_check(exp, 1)
+#define test_equalsf(a, b, e) test_check(test_absf((a) - (b)) < (e), 1)
 #define assert(exp) test_check(exp, 0)
 #define assert_equalsf(a, b, e) test_check(test_absf((a) - (b)) < (e), 0)
 
