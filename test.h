@@ -38,10 +38,6 @@ LICENSE
 #define TEST_API static
 #endif
 
-#ifndef TEST_MAX_NUMBER_OF_TEST_RESULTS
-#define TEST_MAX_NUMBER_OF_TEST_RESULTS 1024
-#endif
-
 typedef struct test_result
 {
     char *file;
