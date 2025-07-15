@@ -22,10 +22,16 @@ int main(void)
   test(i == 1);
   test(10 % 5 == 0);
   test((startX * thisIsAVar) / 10 == startX);
+
   assert_equalsf(1.0f, 1.0f, 1e-4f);
   assert_equalsf(1.0f, 0.99999f, 1e-4f);
   test_equalsf(1.0f, 1.0f, 1e-4f);
   test_equalsf(1.0f, 0.99999f, 1e-4f);
+
+  assert_equalsd(1.0, 1.0, 1e-4);
+  assert_equalsd(1.0, 0.99999, 1e-4);
+  test_equalsd(1.0, 1.0, 1e-4);
+  test_equalsd(1.0, 0.99999, 1e-4);
 
   return 0;
 }

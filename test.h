@@ -107,6 +107,11 @@ TEST_API TEST_INLINE float test_absf(float x)
     return (x < 0.0f ? -x : x);
 }
 
+TEST_API TEST_INLINE double test_absd(double x)
+{
+    return (x < 0.0 ? -x : x);
+}
+
 #define test_check(exp, con)          \
     do                                \
     {                                 \
@@ -125,8 +130,10 @@ TEST_API TEST_INLINE float test_absf(float x)
 
 #define test(exp) test_check(exp, 1)
 #define test_equalsf(a, b, e) test_check(test_absf((a) - (b)) < (e), 1)
+#define test_equalsd(a, b, e) test_check(test_absd((a) - (b)) < (e), 1)
 #define assert(exp) test_check(exp, 0)
 #define assert_equalsf(a, b, e) test_check(test_absf((a) - (b)) < (e), 0)
+#define assert_equalsd(a, b, e) test_check(test_absd((a) - (b)) < (e), 0)
 
 #endif /* TEST_H */
 
