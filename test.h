@@ -125,7 +125,8 @@ TEST_API TEST_INLINE void set_console_color(int color) { (void)color; }
 
 TEST_API TEST_INLINE void test_print_string(char *str)
 {
-    (void)write(STDOUT_FILENO, str, (unsigned int)test_strlen(str));
+    ssize_t written_bytes = write(STDOUT_FILENO, str, (unsigned int)test_strlen(str));
+    (void)written_bytes;
 }
 
 TEST_API TEST_INLINE void test_print_int(int val)
@@ -133,6 +134,8 @@ TEST_API TEST_INLINE void test_print_int(int val)
     char buf[12];
     char *p = buf + 11;
     unsigned int v = (unsigned int)val;
+    ssize_t written_bytes;
+
     *p = '\0';
 
     if (val < 0)
@@ -150,7 +153,8 @@ TEST_API TEST_INLINE void test_print_int(int val)
     {
         *--p = '-';
     }
-    (void)write(STDOUT_FILENO, p, (unsigned int)test_strlen(p));
+    written_bytes = write(STDOUT_FILENO, p, (unsigned int)test_strlen(p));
+    (void)written_bytes;
 }
 
 #endif
