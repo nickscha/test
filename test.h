@@ -173,9 +173,7 @@ TEST_API TEST_INLINE void test_result_print(test_result *result)
     set_console_color(COLOR_BLUE);
     test_print_string(txt_header);
     set_console_color(COLOR_DEFAULT);
-    test_print_string("] ");
-
-    test_print_string("[");
+    test_print_string("] [");
     set_console_color(result->result ? COLOR_GREEN : COLOR_RED);
     test_print_string(result->result ? txt_pass : txt_fail);
     set_console_color(COLOR_DEFAULT);
@@ -201,12 +199,11 @@ TEST_API TEST_INLINE void test_result_print(test_result *result)
     test_print_int(result->line);
 
     /* Add trailing spaces to pad to 5 characters */
-    for (i = 0; i < 6 - num_digits; ++i)
+    for (i = 0; i < 7 - num_digits; ++i)
     {
         test_print_string(" ");
     }
 
-    test_print_string(" ");
     test_print_string(result->expression);
     test_print_string("\n");
 }
