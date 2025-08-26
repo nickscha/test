@@ -48,6 +48,17 @@ typedef struct test_result
 
 } test_result;
 
+TEST_API TEST_INLINE int test_strlen(char *s)
+{
+    int len = 0;
+    while (*s)
+    {
+        len++;
+        s++;
+    }
+    return len;
+}
+
 #ifdef _WIN32
 
 #ifndef _WINDOWS_
@@ -57,6 +68,8 @@ TEST_PLATFORM_WIN32_API(void *)
 GetStdHandle(unsigned long nStdHandle);
 TEST_PLATFORM_WIN32_API(int)
 SetConsoleTextAttribute(void *hConsoleOutput, unsigned short wAttributes);
+TEST_PLATFORM_WIN32_API(int)
+WriteFile(void *hFile, void *lpBuffer, unsigned long nNumberOfBytesToWrite, unsigned long *lpNumberOfBytesWritten, void *lpOverlapped);
 #endif
 
 #define COLOR_DEFAULT 7
@@ -69,7 +82,40 @@ TEST_API TEST_INLINE void set_console_color(unsigned short color)
     SetConsoleTextAttribute(GetStdHandle((unsigned long)-11), color);
 }
 
+TEST_API TEST_INLINE void test_print_string(char *str)
+{
+    unsigned long written;
+    WriteFile(GetStdHandle((unsigned long)-11), str, (unsigned long)test_strlen(str), &written, 0);
+}
+
+TEST_API TEST_INLINE void test_print_int(int val)
+{
+    char buf[12]; /* Enough for a 32-bit integer and a sign */
+    char *p = buf + 11;
+    unsigned int v = (unsigned int)val;
+    *p = '\0';
+
+    if (val < 0)
+    {
+        v = -v;
+    }
+
+    do
+    {
+        *--p = (char)('0' + (v % 10));
+        v /= 10;
+    } while (v != 0);
+
+    if (val < 0)
+    {
+        *--p = '-';
+    }
+    test_print_string(p);
+}
+
 #else
+
+#include <unistd.h>
 
 #define COLOR_DEFAULT 0
 #define COLOR_BLUE 0
@@ -77,33 +123,88 @@ TEST_API TEST_INLINE void set_console_color(unsigned short color)
 #define COLOR_RED 0
 static TEST_INLINE void set_console_color(int color) { (void)color; }
 
-#endif
+static TEST_INLINE void test_print_string(char *str)
+{
+    write(STDOUT_FILENO, str, test_strlen(str));
+}
 
-#ifndef TEST_FUNCTION_PRINTF
-#include <stdio.h>
-#define TEST_FUNCTION_PRINTF(f, a1) (printf(f, a1))
+static TEST_INLINE void test_print_int(int val)
+{
+    char buf[12];
+    char *p = buf + 11;
+    unsigned int v = (unsigned int)val;
+    *p = '\0';
+
+    if (val < 0)
+    {
+        v = -v;
+    }
+
+    do
+    {
+        *--p = (char)('0' + (v % 10));
+        v /= 10;
+    } while (v != 0);
+
+    if (val < 0)
+    {
+        *--p = '-';
+    }
+    write(STDOUT_FILENO, p, test_strlen(p));
+}
+
 #endif
 
 TEST_API TEST_INLINE void test_result_print(test_result *result)
 {
+    int i;
+    int temp_line;
+    int num_digits = 0;
+
     char *txt_header = "TEST";
     char *txt_pass = "PASS";
     char *txt_fail = "FAIL";
 
-    TEST_FUNCTION_PRINTF("%s", "[");
+    test_print_string("[");
     set_console_color(COLOR_BLUE);
-    TEST_FUNCTION_PRINTF("%s", txt_header);
+    test_print_string(txt_header);
     set_console_color(COLOR_DEFAULT);
-    TEST_FUNCTION_PRINTF("%s", "] ");
+    test_print_string("] ");
 
-    TEST_FUNCTION_PRINTF("%s", "[");
+    test_print_string("[");
     set_console_color(result->result ? COLOR_GREEN : COLOR_RED);
-    TEST_FUNCTION_PRINTF("%s", result->result ? txt_pass : txt_fail);
+    test_print_string(result->result ? txt_pass : txt_fail);
     set_console_color(COLOR_DEFAULT);
-    TEST_FUNCTION_PRINTF("%s", "] ");
-    TEST_FUNCTION_PRINTF("%s:", result->file);
-    TEST_FUNCTION_PRINTF("%-6d", result->line);
-    TEST_FUNCTION_PRINTF(" %s\n", result->expression);
+    test_print_string("] ");
+    test_print_string(result->file);
+    test_print_string(":");
+
+    /* Calculate number of digits to print */
+    temp_line = result->line;
+    if (temp_line == 0)
+    {
+        num_digits = 1;
+    }
+    else
+    {
+        while (temp_line != 0)
+        {
+            temp_line /= 10;
+            num_digits++;
+        }
+    }
+
+    test_print_int(result->line);
+
+    /* Add trailing spaces to pad to 5 characters */
+    for (i = 0; i < 6 - num_digits; ++i)
+    {
+        test_print_string(" ");
+    }
+
+    test_print_string(" ");
+    test_print_string(result->expression);
+    test_print_string("\n");
 }
 
 TEST_API TEST_INLINE float test_absf(float x)

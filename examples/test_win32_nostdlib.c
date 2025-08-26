@@ -46,13 +46,6 @@ void *memcpy(void *dest, const void *src, unsigned int count)
     return dest;
 }
 
-/*
-    Simple win32 print function without using the "windows.h" include since it slows
-    down build time
-*/
-#include "win32_print.h"
-
-#define TEST_FUNCTION_PRINTF(f, a1) win32_print_console(f, a1)
 #include "../test.h"
 
 #ifdef __clang__
