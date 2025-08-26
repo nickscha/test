@@ -1,5 +1,17 @@
 name: Compile and Run test.h tests
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      run_release_test:
+        description: 'Run the release job for testing purposes'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   ubuntu:
@@ -55,3 +67,67 @@ jobs:
         with:
           name: windows-latest-${{ matrix.cc }}-test_test
           path: test_test_${{ matrix.cc }}.exe
+
+  # Create and upload release artifacts.
+  release:
+    runs-on: ubuntu-latest
+    needs: [ubuntu, macos, windows]
+    if: github.event_name == 'release' && github.event.action == 'created' || github.event_name == 'workflow_dispatch' && github.event.inputs.run_release_test == 'true'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install zip utility
+        run: sudo apt-get install -y zip
+
+      - name: Download all compiled artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create archives for all test executables
+        run: |
+          mkdir release_executables
+          find artifacts -type f -name 'test_test*' -exec mv {} release_executables/ \;
+          tar -czvf test_test_executables.tar.gz release_executables/
+          zip -r test_test_executables.zip release_executables/
+          tar -cjvf test_test_executables.tar.bz2 release_executables/
+
+      - name: Upload executables as release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_test_executables_tar_gz
+          path: test_test_executables.tar.gz
+      - name: Upload executables as release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_test_executables_zip
+          path: test_test_executables.zip
+      - name: Upload executables as release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_test_executables_tar_bz2
+          path: test_test_executables.tar.bz2
+          
+      - name: Create archives for source code
+        run: |
+          git archive --format tar.gz --output test_h_source.tar.gz HEAD
+          git archive --format zip --output test_h_source.zip HEAD
+          git archive --format tar --output test_h_source.tar HEAD
+          bzip2 test_h_source.tar
+          
+      - name: Upload source code as a release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_h_source_tar_gz
+          path: test_h_source.tar.gz
+      - name: Upload source code as a release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_h_source_zip
+          path: test_h_source.zip
+      - name: Upload source code as a release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_h_source_tar_bz2
+          path: test_h_source.tar.bz2
