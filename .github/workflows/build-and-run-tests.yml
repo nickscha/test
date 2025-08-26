@@ -88,13 +88,11 @@ jobs:
       - name: Create archives for all test executables
         run: |
           mkdir release_executables
-          # Loop through each downloaded artifact directory, extract the executable,
-          # and copy it with a unique name to avoid conflicts.
+          # Loop through each downloaded artifact directory, find the executable,
+          # and copy it with its original file name to a new directory.
           for artifact_dir in artifacts/*; do
             if [ -d "$artifact_dir" ]; then
-              original_file=$(find "$artifact_dir" -type f -name 'test_test*' | head -n 1)
-              unique_name=$(basename "$artifact_dir")
-              cp "$original_file" "release_executables/${unique_name}"
+              find "$artifact_dir" -type f -name 'test_test*' -exec cp {} release_executables/ \;
             fi
           done
           
