@@ -26,7 +26,7 @@ LICENSE
 /* Check if using C99 or later (inline is supported) */
 #if __STDC_VERSION__ >= 199901L
 #define TEST_INLINE inline
-#define TEST_API extern
+#define TEST_API static
 #elif defined(__GNUC__) || defined(__clang__)
 #define TEST_INLINE __inline__
 #define TEST_API static
