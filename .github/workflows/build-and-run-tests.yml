@@ -89,45 +89,45 @@ jobs:
         run: |
           mkdir release_executables
           find artifacts -type f -name 'test_test*' -exec mv {} release_executables/ \;
-          tar -czvf test_test_executables.tar.gz release_executables/
-          zip -r test_test_executables.zip release_executables/
-          tar -cjvf test_test_executables.tar.bz2 release_executables/
+          tar -czvf test_executables.tar.gz release_executables/
+          zip -r test_executables.zip release_executables/
+          tar -cjvf test_executables.tar.bz2 release_executables/
 
       - name: Upload executables as release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: test_test_executables_tar_gz
-          path: test_test_executables.tar.gz
+          name: test_executables_tar_gz
+          path: test_executables.tar.gz
       - name: Upload executables as release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: test_test_executables_zip
-          path: test_test_executables.zip
+          name: test_executables_zip
+          path: test_executables.zip
       - name: Upload executables as release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: test_test_executables_tar_bz2
-          path: test_test_executables.tar.bz2
+          name: test_executables_tar_bz2
+          path: test_executables.tar.bz2
           
       - name: Create archives for source code
         run: |
-          git archive --format tar.gz --output test_h_source.tar.gz HEAD
-          git archive --format zip --output test_h_source.zip HEAD
-          git archive --format tar --output test_h_source.tar HEAD
-          bzip2 test_h_source.tar
+          git archive --format tar.gz --output test_source.tar.gz HEAD
+          git archive --format zip --output test_source.zip HEAD
+          git archive --format tar --output test_source.tar HEAD
+          bzip2 test_source.tar
           
       - name: Upload source code as a release artifact
         uses: actions/upload-artifact@v4
         with:
-          name: test_h_source_tar_gz
-          path: test_h_source.tar.gz
+          name: test_source_tar_gz
+          path: test_source.tar.gz
       - name: Upload source code as a release artifact
         uses: actions/upload-artifact@v4
         with:
-          name: test_h_source_zip
-          path: test_h_source.zip
+          name: test_source_zip
+          path: test_source.zip
       - name: Upload source code as a release artifact
         uses: actions/upload-artifact@v4
         with:
-          name: test_h_source_tar_bz2
-          path: test_h_source.tar.bz2
+          name: test_source_tar_bz2
+          path: test_source.tar.bz2
