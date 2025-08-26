@@ -51,8 +51,12 @@ typedef struct test_result
 #ifdef _WIN32
 
 #ifndef _WINDOWS_
-void *GetStdHandle(unsigned long nStdHandle);
-int SetConsoleTextAttribute(void *hConsoleOutput, unsigned short wAttributes);
+#define TEST_PLATFORM_WIN32_API(r) __declspec(dllimport) r __stdcall
+
+TEST_PLATFORM_WIN32_API(void *)
+GetStdHandle(unsigned long nStdHandle);
+TEST_PLATFORM_WIN32_API(int)
+SetConsoleTextAttribute(void *hConsoleOutput, unsigned short wAttributes);
 #endif
 
 #define COLOR_DEFAULT 7
