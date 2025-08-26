@@ -121,14 +121,14 @@ TEST_API TEST_INLINE void test_print_int(int val)
 #define COLOR_BLUE 0
 #define COLOR_GREEN 0
 #define COLOR_RED 0
-static TEST_INLINE void set_console_color(int color) { (void)color; }
+TEST_API TEST_INLINE void set_console_color(int color) { (void)color; }
 
-static TEST_INLINE void test_print_string(char *str)
+TEST_API TEST_INLINE void test_print_string(char *str)
 {
-    write(STDOUT_FILENO, str, test_strlen(str));
+    (void)write(STDOUT_FILENO, str, (unsigned int)test_strlen(str));
 }
 
-static TEST_INLINE void test_print_int(int val)
+TEST_API TEST_INLINE void test_print_int(int val)
 {
     char buf[12];
     char *p = buf + 11;
@@ -150,7 +150,7 @@ static TEST_INLINE void test_print_int(int val)
     {
         *--p = '-';
     }
-    write(STDOUT_FILENO, p, test_strlen(p));
+    (void)write(STDOUT_FILENO, p, (unsigned int)test_strlen(p));
 }
 
 #endif
