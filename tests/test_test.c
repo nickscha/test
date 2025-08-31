@@ -1,4 +1,4 @@
-/* test.h - v0.2 - public domain data structures - nickscha 2025
+/* test.h - v0.3 - public domain data structures - nickscha 2025
 
 A C89 standard compliant, single header, nostdlib (no C Standard Library) simple testing framework.
 
@@ -8,7 +8,6 @@ LICENSE
   See end of file for detailed license information.
 
 */
-
 #include "../test.h"
 
 int main(void)
